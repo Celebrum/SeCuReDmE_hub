@@ -1,0 +1,37 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+#FROM jupyterhub/jupyterhub-onbuild:0.7.0
+FROM jupyterhub/jupyterhub-onbuild:0.8.0b3
+
+# Install dockerspawner and its dependencies
+RUN /opt/conda/bin/pip install \
+    oauthenticator==0.5.* \
+    dockerspawner==0.5.*
+
+RUN pip install jupyterhub-ldapauthenticator
+
+# install docker on the jupyterhub container
+RUN wget https://get.docker.com -q -O /tmp/getdocker && \
+    chmod +x /tmp/getdocker && \
+    sh /tmp/getdocker
+
+RUN conda install \
+    tornado \
+    && conda clean -yt
+
+# Patch Tornado and Jupyter for session security
+COPY common_libraries/web.py /opt/conda/lib/python3.5/site-packages/tornado/web.py
+COPY common_libraries/static.py /opt/conda/lib/python3.5/site-packages/jupyterhub/handlers/static.py
+COPY jupyterhub_libraries/login.py /opt/conda/lib/python3.5/site-packages/jupyterhub/handlers/login.py
+COPY jupyterhub_libraries/auth.py /opt/conda/lib/python3.5/site-packages/jupyterhub/services/auth.py
+COPY jupyterhub_libraries/templates/login.html /opt/conda/share/jupyter/hub/templates/login.html
+
+# Copy TLS certificate and key
+ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
+ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
+COPY ./secrets/*.crt $SSL_CERT
+COPY ./secrets/*.key $SSL_KEY
+RUN chmod 700 /srv/jupyterhub/secrets && \
+    chmod 600 /srv/jupyterhub/secrets/*
+
+COPY ./userlist /srv/jupyterhub/userlist

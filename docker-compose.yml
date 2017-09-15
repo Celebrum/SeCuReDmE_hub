@@ -1,0 +1,62 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+# JupyterHub docker-compose configuration file
+version: "2"
+
+services:
+  hub:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyterhub
+    image: jupyterhub
+    container_name: ${DOCKER_CONTAINER_NAME}
+    volumes:
+      # Bind Docker socket on the host so we can connect to the daemon from
+      # within the container
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      # Bind Docker volume on host for JupyterHub database and cookie secrets
+      - "data:${DATA_VOLUME_CONTAINER}"
+    ports:
+      - "${JUPYTER_HUB_PORT}:443"
+    environment:
+      # All containers will join this network
+      DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
+      # JupyterHub will spawn this Notebook image for users
+      DOCKER_NOTEBOOK_IMAGE: ${DOCKER_NOTEBOOK_IMAGE}
+      # Notebook directory inside user image
+      DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
+      # Using this run command (optional)
+      DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
+      
+      # URL for a Jupyter Kernel Gateway Server (if using nb2kg/notebook this is important)
+      KG_URL: ${KG_URL}
+      # TOKEN for a Jupyter Kernel Gateway Server (if using nb2kg/notebook this may be important)
+      KG_AUTH_TOKEN: ${KG_AUTH_TOKEN}
+      
+      KG_ENV_WHITELIST: ""
+      # If the Jupyter Kernel Gateway Server is using a self signed certificate (this is important)
+      VALIDATE_KG_CERT: ${VALIDATE_KG_CERT}
+
+      KG_CLIENT_KEY: "/etc/jupyterpki/${CLIENT_KEY}"
+      KG_CLIENT_CERT: "/etc/jupyterpki/${CLIENT_CERT}"
+      KG_CLIENT_CA: "/etc/jupyterpki/${CLIENT_CA}"
+ 
+    command: >
+      jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+      --debug
+      --JupyterHub.authenticator_class='ldapauthenticator.LDAPAuthenticator'
+      --LDAPAuthenticator.server_address=${LDAP_SERVER_HOST}
+      --LDAPAuthenticator.server_port=${LDAP_SERVER_PORT}
+      --LDAPAuthenticator.use_ssl=False
+      --LDAPAuthenticator.bind_dn_template=${LDAP_BIND_DN}
+
+volumes:
+  data:
+    external:
+      name: ${DATA_VOLUME_HOST}
+
+networks:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
