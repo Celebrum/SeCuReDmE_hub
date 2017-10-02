@@ -88,6 +88,7 @@ LDAP_SERVER_PORT=<Port>
 LDAP_BIND_DN=<ldap_bind>  # example 'cn={username},profiletype=USER,cn=example,cn=org'
 ```
 
+**Note:** If LDAP server lives on the same machine hosting the Docker container then it can not be reached at 127.0.0.1 because that will point to the docker container. You need to use an external IP address.
 
 **Note:** The `.env` file is a special file that Docker Compose uses to lookup environment variables.
 If you choose to place the LDAP information in this file,
@@ -255,6 +256,8 @@ The steps include
 * Update TCP/IP profile
 * Set up Policy Agent
 * Define AT-TLS policy
+
+**Note:** When moving to an AT-TLS enabled setup be sure to change KG_URL in .env to https://
 
 ##### Define certificates for Jupyter Kernel Gateway
 On z/OS, digital certificates can be managed through RACF, PKI Services, or other security products. RACF is often used in a simple environment, whereas PKI Services is recommended when a large (50 or more) number of certificates are needed.
