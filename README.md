@@ -48,10 +48,6 @@ This deployment:
 * Uses [LDAPAuthenticator](https://github.com/jupyterhub/ldapauthenticator) to authenticate users
 
 
-### FIX HERE WITH NEW GRAPHIC ###
-![JupyterHub single host Docker deployment](internal/jupyterhub-docker.png)
-
-
 ## Prerequisites
 
 * This deployment uses Docker for all the things, via  [Docker Compose](https://docs.docker.com/compose/overview/).
