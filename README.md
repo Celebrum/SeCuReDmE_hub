@@ -63,6 +63,11 @@ This deployment:
    [create self-signed versions](https://jupyter-notebook.readthedocs.org/en/latest/public_server.html#using-ssl-for-encrypted-communication),
    or obtain real ones from [Let's Encrypt](https://letsencrypt.org)
    (see the [letsencrypt example](examples/letsencrypt/README.md) for instructions).
+* Migrating from Jupyter notebook with nb2kg to Jupyterhub
+   This process is pretty straight forward, and there aren't really any tricks to the process.
+   What you do is download the files on your old Jupyter notebook server to your workstation.
+   Next you start up Jupyterhub, login to your user's server, then upload your files into that environment.
+   When that process is done, make sure your old Jupyter notebook server is down.
 
 From here on, we'll assume you are set up with docker,
 via a local installation or [docker-machine](./docs/docker-machine.md).
