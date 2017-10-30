@@ -1,4 +1,4 @@
-# JKG2AT
+# Jupyterhub and JKG2AT
 
 Table of Contents
 -----------------
